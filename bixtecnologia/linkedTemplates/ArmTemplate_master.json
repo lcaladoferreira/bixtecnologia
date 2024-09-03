@@ -1,0 +1,98 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory name",
+            "defaultValue": "adf-bixtecnologia-dev"
+        },
+        "PostgreSqlTransient_password": {
+            "type": "secureString",
+            "metadata": "Secure string for 'password' of 'PostgreSqlTransient'"
+        },
+        "AzureDataLakeStorageTransient_accountKey": {
+            "type": "secureString",
+            "metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorageTransient'"
+        },
+        "PostgreSqlTransient_properties_typeProperties_server": {
+            "type": "string",
+            "defaultValue": "34.173.103.16"
+        },
+        "PostgreSqlTransient_properties_typeProperties_database": {
+            "type": "string",
+            "defaultValue": "postgres"
+        },
+        "PostgreSqlTransient_properties_typeProperties_username": {
+            "type": "string",
+            "defaultValue": "junior"
+        },
+        "AzureDataLakeStorageTransient_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "https://dlsbixtecnologiadev.dfs.core.windows.net/"
+        },
+        "HttpServerTransient_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "https://us-central1-bix-tecnologia-prd.cloudfunctions.net/"
+        },
+        "ls_databricks_bixtecnologia_properties_typeProperties_existingClusterId": {
+            "type": "string",
+            "defaultValue": "0902-034335-fa5gesox"
+        },
+        "containerUri": {
+            "type": "string",
+            "metadata": "URI to storage account containing linked ARM templates"
+        },
+        "containerSasToken": {
+            "type": "string",
+            "metadata": "Sas token to storage account containing linked ARM templates"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "adf-bixtecnologia-dev_ArmTemplate_0",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-02-01",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "factoryName": {
+                        "value": "[parameters('factoryName')]"
+                    },
+                    "PostgreSqlTransient_password": {
+                        "value": "[parameters('PostgreSqlTransient_password')]"
+                    },
+                    "AzureDataLakeStorageTransient_accountKey": {
+                        "value": "[parameters('AzureDataLakeStorageTransient_accountKey')]"
+                    },
+                    "PostgreSqlTransient_properties_typeProperties_server": {
+                        "value": "[parameters('PostgreSqlTransient_properties_typeProperties_server')]"
+                    },
+                    "PostgreSqlTransient_properties_typeProperties_database": {
+                        "value": "[parameters('PostgreSqlTransient_properties_typeProperties_database')]"
+                    },
+                    "PostgreSqlTransient_properties_typeProperties_username": {
+                        "value": "[parameters('PostgreSqlTransient_properties_typeProperties_username')]"
+                    },
+                    "AzureDataLakeStorageTransient_properties_typeProperties_url": {
+                        "value": "[parameters('AzureDataLakeStorageTransient_properties_typeProperties_url')]"
+                    },
+                    "HttpServerTransient_properties_typeProperties_url": {
+                        "value": "[parameters('HttpServerTransient_properties_typeProperties_url')]"
+                    },
+                    "ls_databricks_bixtecnologia_properties_typeProperties_existingClusterId": {
+                        "value": "[parameters('ls_databricks_bixtecnologia_properties_typeProperties_existingClusterId')]"
+                    }
+                }
+            },
+            "dependsOn": []
+        }
+    ]
+}

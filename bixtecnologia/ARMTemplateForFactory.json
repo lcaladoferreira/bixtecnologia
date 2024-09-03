@@ -1,0 +1,720 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory name",
+            "defaultValue": "adf-bixtecnologia-dev"
+        },
+        "PostgreSqlTransient_password": {
+            "type": "secureString",
+            "metadata": "Secure string for 'password' of 'PostgreSqlTransient'"
+        },
+        "AzureDataLakeStorageTransient_accountKey": {
+            "type": "secureString",
+            "metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorageTransient'"
+        },
+        "PostgreSqlTransient_properties_typeProperties_server": {
+            "type": "string",
+            "defaultValue": "34.173.103.16"
+        },
+        "PostgreSqlTransient_properties_typeProperties_database": {
+            "type": "string",
+            "defaultValue": "postgres"
+        },
+        "PostgreSqlTransient_properties_typeProperties_username": {
+            "type": "string",
+            "defaultValue": "junior"
+        },
+        "AzureDataLakeStorageTransient_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "https://dlsbixtecnologiadev.dfs.core.windows.net/"
+        },
+        "HttpServerTransient_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "https://us-central1-bix-tecnologia-prd.cloudfunctions.net/"
+        },
+        "ls_databricks_bixtecnologia_properties_typeProperties_existingClusterId": {
+            "type": "string",
+            "defaultValue": "0902-034335-fa5gesox"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/pipeline_bixtecnologia')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "copy_trasnient_public_venda",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "ParquetSource",
+                                "storeSettings": {
+                                    "type": "AzureBlobFSReadSettings",
+                                    "recursive": true,
+                                    "enablePartitionDiscovery": false
+                                },
+                                "formatSettings": {
+                                    "type": "ParquetReadSettings"
+                                }
+                            },
+                            "sink": {
+                                "type": "ParquetSink",
+                                "storeSettings": {
+                                    "type": "AzureBlobFSWriteSettings"
+                                },
+                                "formatSettings": {
+                                    "type": "ParquetWriteSettings"
+                                }
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "typeConversion": true,
+                                "typeConversionSettings": {
+                                    "allowDataTruncation": true,
+                                    "treatBooleanAsNumber": false
+                                }
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_public_venda",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "sink_public_venda",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    },
+                    {
+                        "name": "copy_trasient_nomecategoria",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "ParquetSource",
+                                "storeSettings": {
+                                    "type": "AzureBlobFSReadSettings",
+                                    "recursive": true,
+                                    "enablePartitionDiscovery": false
+                                },
+                                "formatSettings": {
+                                    "type": "ParquetReadSettings"
+                                }
+                            },
+                            "sink": {
+                                "type": "ParquetSink",
+                                "storeSettings": {
+                                    "type": "AzureBlobFSWriteSettings"
+                                },
+                                "formatSettings": {
+                                    "type": "ParquetWriteSettings"
+                                }
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "typeConversion": true,
+                                "typeConversionSettings": {
+                                    "allowDataTruncation": true,
+                                    "treatBooleanAsNumber": false
+                                }
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "ds_nomecategoria",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "sink_nomecategoria",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    },
+                    {
+                        "name": "forEach_transient_users_api",
+                        "type": "ForEach",
+                        "dependsOn": [],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@range(1, 10)",
+                                "type": "Expression"
+                            },
+                            "isSequential": true,
+                            "activities": [
+                                {
+                                    "name": "copy_foreach_transient_api_users",
+                                    "type": "Copy",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "timeout": "0.12:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "source": {
+                                            "type": "HttpSource",
+                                            "httpRequestTimeout": "00:01:40",
+                                            "storeSettings": {
+                                                "type": "HttpReadSettings",
+                                                "requestMethod": "GET"
+                                            }
+                                        },
+                                        "sink": {
+                                            "type": "ParquetSink",
+                                            "storeSettings": {
+                                                "type": "AzureBlobFSWriteSettings"
+                                            },
+                                            "formatSettings": {
+                                                "type": "ParquetWriteSettings"
+                                            }
+                                        },
+                                        "enableStaging": false,
+                                        "translator": {
+                                            "type": "TabularTranslator",
+                                            "typeConversion": true,
+                                            "typeConversionSettings": {
+                                                "allowDataTruncation": true,
+                                                "treatBooleanAsNumber": false
+                                            }
+                                        }
+                                    },
+                                    "inputs": [
+                                        {
+                                            "referenceName": "ds_users",
+                                            "type": "DatasetReference",
+                                            "parameters": {
+                                                "id": {
+                                                    "value": "@item()",
+                                                    "type": "Expression"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "outputs": [
+                                        {
+                                            "referenceName": "sink_users",
+                                            "type": "DatasetReference",
+                                            "parameters": {}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "notebook_bronze_public_venda",
+                        "type": "DatabricksNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "copy_trasnient_public_venda",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "copy_trasient_nomecategoria",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "forEach_transient_users_api",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "notebookPath": "/01.bronze/notebook_bronze_public_venda"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "ls_databricks_bixtecnologia",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "notebook_bronze_nome_categoria",
+                        "type": "DatabricksNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "copy_trasnient_public_venda",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "copy_trasient_nomecategoria",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "forEach_transient_users_api",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "notebookPath": "/01.bronze/notebook_bronze_nome_categoria"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "ls_databricks_bixtecnologia",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "notebook_bronze_users",
+                        "type": "DatabricksNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "copy_trasnient_public_venda",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "copy_trasient_nomecategoria",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "forEach_transient_users_api",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "notebookPath": "/01.bronze/notebook_bronze_users"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "ls_databricks_bixtecnologia",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "notebook_silver_vendas",
+                        "type": "DatabricksNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "notebook_bronze_public_venda",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "notebook_bronze_nome_categoria",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "notebook_bronze_users",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "notebookPath": "/02.silver/notebook_silver_vendas"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "ls_databricks_bixtecnologia",
+                            "type": "LinkedServiceReference"
+                        }
+                    },
+                    {
+                        "name": "notebook_gold_total_vendas",
+                        "type": "DatabricksNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "notebook_silver_vendas",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "notebookPath": "/03.gold/notebook_gold_total_vendas"
+                        },
+                        "linkedServiceName": {
+                            "referenceName": "ls_databricks_bixtecnologia",
+                            "type": "LinkedServiceReference"
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "annotations": [],
+                "lastPublishTime": "2024-09-03T15:33:35Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/ds_public_venda')]",
+                "[concat(variables('factoryId'), '/datasets/sink_public_venda')]",
+                "[concat(variables('factoryId'), '/datasets/ds_nomecategoria')]",
+                "[concat(variables('factoryId'), '/datasets/sink_nomecategoria')]",
+                "[concat(variables('factoryId'), '/linkedServices/ls_databricks_bixtecnologia')]",
+                "[concat(variables('factoryId'), '/datasets/ds_users')]",
+                "[concat(variables('factoryId'), '/datasets/sink_users')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/sink_nomecategoria')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureDataLakeStorageTransient",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "Parquet",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileSystem": "transient"
+                    },
+                    "compressionCodec": "snappy"
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageTransient')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_public_venda')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureDataLakeStorageTransient",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "Parquet",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileName": "\"public\".\"venda\".parquet",
+                        "fileSystem": "transient"
+                    },
+                    "compressionCodec": "snappy"
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageTransient')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/sink_public_venda')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureDataLakeStorageTransient",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "Parquet",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileSystem": "transient"
+                    },
+                    "compressionCodec": "snappy"
+                },
+                "schema": [
+                    {
+                        "name": "id_venda",
+                        "type": "INT32"
+                    },
+                    {
+                        "name": "id_funcionario",
+                        "type": "INT32"
+                    },
+                    {
+                        "name": "id_categoria",
+                        "type": "INT32"
+                    },
+                    {
+                        "name": "data_venda",
+                        "type": "INT96"
+                    },
+                    {
+                        "name": "venda",
+                        "type": "INT32"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageTransient')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_nomecategoria')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureDataLakeStorageTransient",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "Parquet",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileName": "categoria.parquet",
+                        "fileSystem": "db-bixtecnologiadev"
+                    },
+                    "compressionCodec": "snappy"
+                },
+                "schema": [
+                    {
+                        "name": "id",
+                        "type": "INT64"
+                    },
+                    {
+                        "name": "nome_categoria",
+                        "type": "UTF8"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageTransient')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_users')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "HttpServerTransient",
+                    "type": "LinkedServiceReference"
+                },
+                "parameters": {
+                    "id": {
+                        "type": "string"
+                    }
+                },
+                "annotations": [],
+                "type": "Parquet",
+                "typeProperties": {
+                    "location": {
+                        "type": "HttpServerLocation",
+                        "relativeUrl": {
+                            "value": "api_challenge_junior?id=@{dataset().id}",
+                            "type": "Expression"
+                        }
+                    },
+                    "compressionCodec": "snappy"
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/HttpServerTransient')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/sink_users')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "AzureDataLakeStorageTransient",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "Parquet",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileSystem": "transient"
+                    },
+                    "compressionCodec": "snappy"
+                },
+                "schema": [
+                    {
+                        "name": "id_venda",
+                        "type": "INT32"
+                    },
+                    {
+                        "name": "id_funcionario",
+                        "type": "INT32"
+                    },
+                    {
+                        "name": "id_categoria",
+                        "type": "INT32"
+                    },
+                    {
+                        "name": "data_venda",
+                        "type": "INT96"
+                    },
+                    {
+                        "name": "venda",
+                        "type": "INT32"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorageTransient')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/PostgreSqlTransient')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "PostgreSqlV2",
+                "typeProperties": {
+                    "server": "[parameters('PostgreSqlTransient_properties_typeProperties_server')]",
+                    "port": 5432,
+                    "database": "[parameters('PostgreSqlTransient_properties_typeProperties_database')]",
+                    "username": "[parameters('PostgreSqlTransient_properties_typeProperties_username')]",
+                    "password": {
+                        "type": "SecureString",
+                        "value": "[parameters('PostgreSqlTransient_password')]"
+                    },
+                    "sslMode": 2,
+                    "authenticationType": "Basic"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/AzureDataLakeStorageTransient')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureBlobFS",
+                "typeProperties": {
+                    "url": "[parameters('AzureDataLakeStorageTransient_properties_typeProperties_url')]",
+                    "accountKey": {
+                        "type": "SecureString",
+                        "value": "[parameters('AzureDataLakeStorageTransient_accountKey')]"
+                    }
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/HttpServerTransient')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "HttpServer",
+                "typeProperties": {
+                    "url": "[parameters('HttpServerTransient_properties_typeProperties_url')]",
+                    "enableServerCertificateValidation": true,
+                    "authenticationType": "Anonymous"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ls_databricks_bixtecnologia')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureDatabricks",
+                "typeProperties": {
+                    "domain": "https://adb-1715589345407578.18.azuredatabricks.net",
+                    "authentication": "MSI",
+                    "workspaceResourceId": "/subscriptions/13a780bf-e9e9-4d9d-ba19-485f536fcfc8/resourceGroups/rg_bixtecnologia_dev/providers/Microsoft.Databricks/workspaces/dbw-bixtecnologia-dev",
+                    "existingClusterId": "[parameters('ls_databricks_bixtecnologia_properties_typeProperties_existingClusterId')]"
+                }
+            },
+            "dependsOn": []
+        }
+    ]
+}
