@@ -1,6 +1,7 @@
 # Projeto de Infraestrutura de Dados com Azure
 
 Este repositório contém a estrutura e os detalhes do projeto de infraestrutura de dados utilizando serviços do Azure, incluindo Azure Data Lake, Data Factory e Databricks. O objetivo principal é criar uma solução escalável e eficiente para gerenciar e processar grandes volumes de dados, garantindo redundância e segurança.
+![image](https://github.com/user-attachments/assets/fe6244df-764e-4a3d-8b91-804d6605418c)
 
 ## Índice
 
